@@ -82,6 +82,66 @@ export const UserStoreModel = types
       }
     }),
 
+    sendOtp: flow(function* () {
+      try {
+        const { email } = store
+
+        if (__DEV__) {
+          // TODO: need to store some otp for local check ?
+          return
+        }
+
+        api.apisauce.addRequestTransform((request: Parameters<RequestTransform>[0]) => {
+          if (request.url?.includes("/sendOtp")) {
+            request.headers = request.headers ?? {}
+            // # TODO: Setup react-native-config
+            request.headers["Auth-Key"] = process.env.LOGIN_AUTH_SECRET || "abcd"
+          }
+        })
+
+        const payload = { email }
+
+        const response = yield api.post("/sendOtp", payload)
+
+        if (response.ok) {
+        } else {
+          throw new Error(response.data)
+        }
+      } catch (err) {
+        console.error("Failed to SendOtp", err)
+      }
+    }),
+
+    changePassword: flow(function* () {
+      try {
+        const { email } = store
+
+        if (__DEV__) {
+          // TODO: need to store some otp for local check ?
+          return
+        }
+
+        api.apisauce.addRequestTransform((request: Parameters<RequestTransform>[0]) => {
+          if (request.url?.includes("/sendOtp")) {
+            request.headers = request.headers ?? {}
+            // # TODO: Setup react-native-config
+            request.headers["Auth-Key"] = process.env.LOGIN_AUTH_SECRET || "abcd"
+          }
+        })
+
+        const payload = { email }
+
+        const response = yield api.post("/sendOtp", payload)
+
+        if (response.ok) {
+        } else {
+          throw new Error(response.data)
+        }
+      } catch (err) {
+        console.error("Failed to login", err)
+      }
+    }),
+
     logout() {
       remove("token")
       store.authToken = undefined

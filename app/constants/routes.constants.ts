@@ -18,12 +18,15 @@ export enum RouteName {
   Downloads = "Downloads",
   History = "History",
   Login = "Login",
+  ConfirmEmail = "ConfirmEmail",
   MyCourses = "MyCourses",
   Storybook = "Storybook",
   TabNavigator = "TabNavigator",
   VideoPlayer = "VideoPlayer",
   Webview = "Webview",
   Welcome = "Welcome",
+  VerifyOtp = "VerifyOtp",
+  ChangePassword = "ChangePassword",
 }
 
 export const TAB_ROUTES: Array<{

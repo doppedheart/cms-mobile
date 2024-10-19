@@ -9,6 +9,9 @@ import * as Screens from "app/screens"
 export type AuthStackParamList = {
   Login: undefined
   Welcome: undefined
+  ConfirmEmail: undefined
+  VerifyOtp: undefined
+  ChangePassword: undefined
 }
 
 export type AuthStackScreenProps<T extends keyof AuthStackParamList> = NativeStackScreenProps<
@@ -26,6 +29,9 @@ const AuthNavigator = observer(() => {
     >
       <AuthStack.Screen name={RouteName.Welcome} component={Screens.WelcomeScreen} />
       <AuthStack.Screen name={RouteName.Login} component={Screens.LoginScreen} />
+      <AuthStack.Screen name={RouteName.ConfirmEmail} component={Screens.ConfirmEmailScreen} />
+      <AuthStack.Screen name={RouteName.VerifyOtp} component={Screens.VerifyOtpScreen} />
+      <AuthStack.Screen name={RouteName.ChangePassword} component={Screens.ChangePasswordScreen} />
     </AuthStack.Navigator>
   )
 })

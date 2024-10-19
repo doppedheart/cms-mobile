@@ -5,10 +5,13 @@ import { AuthStackScreenProps, goBack } from "app/navigators"
 import { Button, Header, Screen, Text, TextField } from "app/components"
 import { colors, spacing, typography } from "app/theme"
 import { useLogin } from "app/hooks"
+import { useNavigation } from "@react-navigation/native"
+import { RouteName } from "app/constants"
 
 interface LoginScreenProps extends AuthStackScreenProps<"Login"> {}
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen() {
+  const navigation = useNavigation<any>()
   const {
     authPasswordInput,
     email,
@@ -64,7 +67,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen()
         value={password}
         containerStyle={$passwordFieldContainer}
       />
-      <Text text="Forgot Password?" preset="formHelper" style={$forgotPasswordText} />
+      <Text
+        onPress={() => navigation.navigate(RouteName.ConfirmEmail)}
+        text="Forgot Password?"
+        preset="formHelper"
+        style={$forgotPasswordText}
+      />
       <Button onPress={handleLogin} style={$button} text="Login" />
       <View style={$footer}>
         <Text style={$helperText} text="Don't have an account?" preset="formHelper" />
