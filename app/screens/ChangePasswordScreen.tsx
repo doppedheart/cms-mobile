@@ -3,19 +3,25 @@ import { observer } from "mobx-react-lite"
 import { TextStyle, View, ViewStyle } from "react-native"
 import { AuthStackScreenProps, goBack } from "app/navigators"
 import { Button, Header, Screen, Text, TextField } from "app/components"
-import { useNavigation } from "@react-navigation/native"
-import { colors, spacing, typography } from "app/theme"
-import { RouteName } from "app/constants"
-import { useStores } from "app/models"
-// import { useNavigation } from "@react-navigation/native"
-// import { useStores } from "app/models"
+import { colors, spacing } from "app/theme"
+import { useForgotPassword } from "app/hooks/useForgotPassword"
 
 interface ChangePasswordScreenProps extends AuthStackScreenProps<"ChangePassword"> {}
 
 export const ChangePasswordScreen: FC<ChangePasswordScreenProps> = observer(
   function ChangePasswordScreen() {
-    const { userStore } = useStores()
-    const { changePassword } = userStore
+    const {
+      error,
+      password,
+      confirmPassword,
+      handlePasswordChange,
+      handleSubmitChangePassword,
+      handleConfirmPasswordChange,
+      authPasswordInput,
+      PasswordRightAccessory,
+      isAuthPasswordHidden,
+    } = useForgotPassword()
+
     return (
       <Screen style={$root} preset="scroll">
         <Header
@@ -24,23 +30,10 @@ export const ChangePasswordScreen: FC<ChangePasswordScreenProps> = observer(
           leftIconColor={colors.content.secondary}
           onLeftPress={goBack}
         />
-        <Text text="Login Now" preset="heading" />
+        <Text text="Change Password" preset="heading" />
         <Text
           style={$subheading}
-          text="Log in to access your coding cohorts and continue your journey."
-        />
-        {/* <TextField
-          autoCapitalize="none"
-          autoComplete="email"
-          autoCorrect={false}
-          helper={error.email}
-          keyboardType="email-address"
-          onChangeText={handleEmailChange}
-          onSubmitEditing={focusPasswordInput}
-          label="Email Address / Phone no."
-          placeholder="Enter Email Address / Phone no."
-          status={error.email ? "error" : undefined}
-          value={email}
+          text="Create a new secure password consisting of alpha numeric characters"
         />
         <TextField
           autoCapitalize="none"
@@ -48,7 +41,7 @@ export const ChangePasswordScreen: FC<ChangePasswordScreenProps> = observer(
           autoCorrect={false}
           helper={error.password}
           onChangeText={handlePasswordChange}
-          onSubmitEditing={handleLogin}
+          onSubmitEditing={handleSubmitChangePassword}
           label="Password"
           placeholder="Enter Password"
           ref={authPasswordInput}
@@ -57,8 +50,24 @@ export const ChangePasswordScreen: FC<ChangePasswordScreenProps> = observer(
           status={error.password ? "error" : undefined}
           value={password}
           containerStyle={$passwordFieldContainer}
-        /> */}
-        <Button style={$button} text="Login" />
+        />
+        <TextField
+          autoCapitalize="none"
+          autoComplete="password"
+          autoCorrect={false}
+          helper={error.confirmPassword}
+          onChangeText={handleConfirmPasswordChange}
+          onSubmitEditing={handleSubmitChangePassword}
+          label="Confirm Password"
+          placeholder="Re-Enter Password"
+          ref={authPasswordInput}
+          RightAccessory={PasswordRightAccessory}
+          secureTextEntry={isAuthPasswordHidden}
+          status={error.confirmPassword ? "error" : undefined}
+          value={confirmPassword}
+          containerStyle={$passwordFieldContainer}
+        />
+        <Button onPress={handleSubmitChangePassword} style={$button} text="Submit" />
         <View style={$footer}>
           <Text style={$helperText} text="Don't have an account?" preset="formHelper" />
           <Text style={$helperTextLink} text="Sign Up" />
@@ -81,14 +90,6 @@ const $subheading: TextStyle = {
 
 const $passwordFieldContainer: ViewStyle = {
   marginTop: spacing.md,
-}
-
-const $forgotPasswordText: TextStyle = {
-  color: colors.content.brand,
-  fontFamily: typography.primary.normal,
-  fontSize: 14,
-  lineHeight: 20,
-  marginTop: spacing.xs,
 }
 
 const $button: ViewStyle = {

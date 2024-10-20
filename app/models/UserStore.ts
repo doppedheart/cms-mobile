@@ -87,12 +87,12 @@ export const UserStoreModel = types
         const { email } = store
 
         if (__DEV__) {
-          // TODO: need to store some otp for local check ?
+          // don't need to check any thing over here
           return
         }
 
         api.apisauce.addRequestTransform((request: Parameters<RequestTransform>[0]) => {
-          if (request.url?.includes("/sendOtp")) {
+          if (request.url?.includes("/send-otp")) {
             request.headers = request.headers ?? {}
             // # TODO: Setup react-native-config
             request.headers["Auth-Key"] = process.env.LOGIN_AUTH_SECRET || "abcd"
@@ -101,8 +101,37 @@ export const UserStoreModel = types
 
         const payload = { email }
 
-        const response = yield api.post("/sendOtp", payload)
+        const response = yield api.post("/send-otp", payload)
+        // # TODO: Handle response from server for status ok
+        if (response.ok) {
+        } else {
+          throw new Error(response.data)
+        }
+      } catch (err) {
+        console.error("Failed to SendOtp", err)
+      }
+    }),
 
+    verifyOtp: flow(function* (otp) {
+      try {
+        if (__DEV__) {
+          // TODO: need to store otp for local check ?
+          console.log(otp)
+          console.log("navigating to change password")
+          return
+        }
+
+        api.apisauce.addRequestTransform((request: Parameters<RequestTransform>[0]) => {
+          if (request.url?.includes("/verify-otp")) {
+            request.headers = request.headers ?? {}
+            // # TODO: Setup react-native-config
+            request.headers["Auth-Key"] = process.env.LOGIN_AUTH_SECRET || "abcd"
+          }
+        })
+        const payload = { otp }
+
+        const response = yield api.post("/verify-otp", payload)
+        // # TODO: Handle verifies-otp status ok . need to take care of token management here or in change password screen?
         if (response.ok) {
         } else {
           throw new Error(response.data)
@@ -114,26 +143,34 @@ export const UserStoreModel = types
 
     changePassword: flow(function* () {
       try {
-        const { email } = store
+        const { password } = store
 
         if (__DEV__) {
-          // TODO: need to store some otp for local check ?
+          store.authToken = "token"
+          saveString("token", "token")
           return
         }
 
         api.apisauce.addRequestTransform((request: Parameters<RequestTransform>[0]) => {
-          if (request.url?.includes("/sendOtp")) {
+          if (request.url?.includes("/change-password")) {
             request.headers = request.headers ?? {}
             // # TODO: Setup react-native-config
             request.headers["Auth-Key"] = process.env.LOGIN_AUTH_SECRET || "abcd"
           }
         })
 
-        const payload = { email }
+        const payload = { password }
 
-        const response = yield api.post("/sendOtp", payload)
-
+        const response = yield api.post("/change-password", payload)
+        // # TODO : token storing here either we can store token in verify-otp ?
         if (response.ok) {
+          const token = response.data?.data?.token
+          const username = response.data?.data?.name
+
+          store.authToken = token
+          store.username = username
+          saveString("token", token)
+          saveString("username", username)
         } else {
           throw new Error(response.data)
         }

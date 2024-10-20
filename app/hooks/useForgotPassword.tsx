@@ -8,10 +8,22 @@ import { useNavigation } from "@react-navigation/native"
 
 export function useForgotPassword() {
   const { userStore } = useStores()
-  const { sendOtp, setEmail, email, validationEmail } = userStore
+  const {
+    sendOtp,
+    setPassword,
+    setEmail,
+    changePassword,
+    email,
+    password,
+    validationPassword,
+    validationEmail,
+  } = userStore
   const navigation = useNavigation<any>()
+  const [confirmPassword, setConfirmPassword] = useState<string>("")
   const [error, setError] = useState({
     email: "",
+    password: "",
+    confirmPassword: "",
   })
 
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
@@ -30,16 +42,40 @@ export function useForgotPassword() {
     }
   }
 
-  // const handlePasswordChange = (text: string) => {
-  //   setPassword(text)
-  //   if (error.password) {
-  //     setError((prevError) => ({ ...prevError, password: "" }))
-  //   }
-  // }
+  const handlePasswordChange = (text: string) => {
+    setPassword(text)
+    if (error.password) {
+      setError((prevError) => ({ ...prevError, password: "" }))
+    }
+  }
+
+  const handleConfirmPasswordChange = (text: string) => {
+    setConfirmPassword(text)
+    if (error.confirmPassword) {
+      setError((prevError) => ({ ...prevError, confirmPassword: "" }))
+    }
+  }
+
+  const validationConfirmPassword =
+    confirmPassword.length === 0
+      ? "Can't be blank"
+      : confirmPassword != password
+      ? "Password don't match"
+      : ""
 
   const validateEmailAddress = () => {
     const emailError = validationEmail
     const newErrors = { email: emailError }
+
+    setError((prevError) => ({ ...prevError, ...newErrors }))
+
+    return !Object.values(newErrors).some((error) => error)
+  }
+
+  const validateChangePassword = () => {
+    const passwordError = validationPassword
+    const confirmPasswordError = validationConfirmPassword
+    const newErrors = { password: passwordError, confirmPassword: confirmPasswordError }
 
     setError((prevError) => ({ ...prevError, ...newErrors }))
 
@@ -53,6 +89,14 @@ export function useForgotPassword() {
 
     await sendOtp()
     navigation.navigate(RouteName.VerifyOtp)
+  }
+
+  const handleSubmitChangePassword = async () => {
+    const isChangePasswordValid = validateChangePassword()
+
+    if (!isChangePasswordValid) return
+
+    await changePassword()
   }
 
   const PasswordRightAccessory: React.ComponentType<TextFieldAccessoryProps> = useMemo(
@@ -79,6 +123,8 @@ export function useForgotPassword() {
   useEffect(() => {
     if (__DEV__) {
       setEmail("testuser@example.com")
+      setPassword("123456")
+      setConfirmPassword("123456")
     }
     // TODO: This can be done in the login function [Good UX] maintenance
     // Here is where you could fetch credentials from keychain or storage
@@ -88,12 +134,17 @@ export function useForgotPassword() {
   }, [])
 
   return {
-    authPasswordInput,
     email,
+    password,
+    confirmPassword,
     error,
     focusPasswordInput,
     handleEmailChange,
     handleConfirmEmail,
+    handlePasswordChange,
+    handleSubmitChangePassword,
+    handleConfirmPasswordChange,
+    authPasswordInput,
     isAuthPasswordHidden,
     PasswordRightAccessory,
   }

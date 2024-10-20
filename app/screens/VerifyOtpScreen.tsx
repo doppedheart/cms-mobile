@@ -6,12 +6,12 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from "react-native-confirmation-code-field"
-
 import { AuthStackScreenProps } from "app/navigators"
 import { Screen, Text } from "app/components"
 import { AUTO_COMPLETE_MAP, CELL_COUNT, RESEND_TIME, RouteName } from "app/constants"
 import { useNavigation } from "@react-navigation/native"
 import { colors, spacing } from "app/theme"
+import { useStores } from "app/models"
 
 interface VerifyOtpScreenProps extends AuthStackScreenProps<"VerifyOtp"> {}
 
@@ -26,13 +26,8 @@ export const VerifyOtpScreen: FC<VerifyOtpScreenProps> = observer(function Verif
   })
   const [resendOtpTimer, setResendOtpTimer] = useState<number>(RESEND_TIME)
   const navigation = useNavigation<any>()
-  useEffect(() => {
-    if (resendOtpTimer > 0) {
-      setTimeout(() => {
-        setResendOtpTimer((prev) => prev - 1)
-      }, 1000)
-    }
-  }, [resendOtpTimer])
+  const { userStore } = useStores()
+  const { sendOtp, verifyOtp } = userStore
 
   const submitOtp = async (value: string) => {
     if (isSubmitLoading) {
@@ -40,11 +35,10 @@ export const VerifyOtpScreen: FC<VerifyOtpScreenProps> = observer(function Verif
     }
 
     setIsSubmitLoading(true)
-    setTimeout(() => {
+    // added timeout just to check Verifying Otp... display message
+    setTimeout(async () => {
       setIsSubmitLoading(false)
-
-      // Prevent user from going back to previous screens after navigating to 'CreateProfile'
-      // navigation.navigate(RouteName.Welcome)
+      await verifyOtp(value)
       navigation.navigate(RouteName.ChangePassword)
     }, 3000)
   }
@@ -52,11 +46,12 @@ export const VerifyOtpScreen: FC<VerifyOtpScreenProps> = observer(function Verif
   const resendOtp = async () => {
     setIsResendLoading(true)
     setOtp("")
-
-    setTimeout(() => {
+    // keeping this timeout for check Sending Otp is visible or not
+    setTimeout(async () => {
+      await sendOtp()
       setIsResendLoading(false)
       setResendOtpTimer(RESEND_TIME)
-    }, 3000)
+    }, 1000)
   }
 
   const getResendOtpText = () => {
@@ -65,6 +60,13 @@ export const VerifyOtpScreen: FC<VerifyOtpScreenProps> = observer(function Verif
     return `Resend Otp ${resendOtpTimer > 0 ? `in ${resendOtpTimer}s` : ""}`
   }
 
+  useEffect(() => {
+    if (resendOtpTimer > 0) {
+      setTimeout(() => {
+        setResendOtpTimer((prev) => prev - 1)
+      }, 1000)
+    }
+  }, [resendOtpTimer])
   return (
     <Screen style={styles.container} preset="auto">
       <View style={styles.OTPSection}>
