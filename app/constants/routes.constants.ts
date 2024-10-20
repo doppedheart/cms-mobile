@@ -56,10 +56,10 @@ export const TAB_ROUTES: Array<{
     name: RouteName.History,
     translationKey: "tabNavigator.history",
   },
-  {
-    component: Screens.AccountScreen,
-    icon: UserCircleIcon,
-    name: RouteName.Account,
-    translationKey: "tabNavigator.account",
-  },
+  // {
+  //   component: Screens.AccountScreen,
+  //   icon: UserCircleIcon,
+  //   name: RouteName.Account,
+  //   translationKey: "tabNavigator.account",
+  // },
 ]

@@ -2,12 +2,10 @@ import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigatio
 import { CompositeScreenProps } from "@react-navigation/native"
 import React from "react"
 import { TextStyle, ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
-
-import { translate } from "../i18n"
-import { colors, spacing, typography } from "../theme"
+import { colors } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import { TAB_ROUTES } from "app/constants"
+import { Text } from "app/components"
 
 export type TabParamList = {
   Account: undefined
@@ -44,14 +42,24 @@ const Tab = createBottomTabNavigator<TabParamList>()
 
 const renderTabs = () => {
   return TAB_ROUTES.map((route) => {
-    const { name: routeName, component, translationKey, icon: Icon } = route
+    const { name: routeName, component, icon: Icon } = route
     return (
       <Tab.Screen
         component={component}
         key={routeName}
         name={routeName}
         options={{
-          tabBarLabel: translate(translationKey),
+          tabBarLabel: ({ focused }) => (
+            <Text
+              style={{
+                color: focused ? "#4A90E2" : colors.background.secondary,
+                fontSize: 10,
+                paddingLeft: 15,
+              }}
+            >
+              {focused ? route.name : ""}
+            </Text>
+          ),
           tabBarIcon: ({ focused }) => (
             <Icon color={focused ? colors.content.brand : colors.content.secondary} size={24} />
           ),
@@ -69,18 +77,17 @@ const renderTabs = () => {
  * @returns {JSX.Element} The rendered `TabNavigator`.
  */
 export function TabNavigator() {
-  const { bottom } = useSafeAreaInsets()
-
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarStyle: [$tabBar, { height: bottom + 50 }],
+        tabBarStyle: [$tabBar],
         tabBarActiveTintColor: colors.content.brand,
         tabBarInactiveTintColor: colors.content.secondary,
         tabBarLabelStyle: $tabBarLabel,
         tabBarItemStyle: $tabBarItem,
+        tabBarLabelPosition: "beside-icon",
       }}
     >
       {renderTabs()}
@@ -90,20 +97,14 @@ export function TabNavigator() {
 
 const $tabBar: ViewStyle = {
   backgroundColor: colors.background.secondary,
-  borderTopColor: colors.border.default,
   borderTopWidth: 1,
+  elevation: 0,
+  height: 60,
   // TODO: Can make an issue for this [#issue]
   // borderTopRightRadius: spacing.md,
   // borderTopLeftRadius: spacing.md,
 }
 
-const $tabBarItem: ViewStyle = {
-  paddingTop: spacing.md,
-}
+const $tabBarItem: ViewStyle = {}
 
-const $tabBarLabel: TextStyle = {
-  marginTop: spacing.xxxs,
-  fontSize: 10,
-  fontFamily: typography.primary.medium,
-  lineHeight: 14,
-}
+const $tabBarLabel: TextStyle = {}
