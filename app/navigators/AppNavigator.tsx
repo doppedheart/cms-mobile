@@ -22,6 +22,7 @@ import { ContentType, RouteName } from "app/constants"
 import { useStores } from "app/models"
 import AuthNavigator from "./AuthNavigator"
 import { TabNavigator, TabParamList } from "./TabNavigator"
+import { SidebarNavigator, SidebarNavigatorParamList } from "./SidebarNavigator"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -40,6 +41,7 @@ export type AppStackParamList = {
   ContentView: { type?: ContentType }
   Storybook: undefined
   TabNavigator: NavigatorScreenParams<TabParamList>
+  SidebarNavigator: NavigatorScreenParams<SidebarNavigatorParamList>
   VideoPlayer: undefined
   Webview: { url: string }
 }
@@ -65,6 +67,7 @@ const AppStack = observer(function AppStack() {
       screenOptions={{ headerShown: false, navigationBarColor: colors.background.primary }}
     >
       <Stack.Screen name={RouteName.TabNavigator} component={TabNavigator} />
+      <Stack.Screen name={RouteName.SidebarNavigator} component={SidebarNavigator} />
       <Stack.Screen name={RouteName.ContentView} component={Screens.ContentViewScreen} />
       <Stack.Screen name={RouteName.Storybook} component={Screens.StorybookScreen} />
       <Stack.Screen name={RouteName.VideoPlayer} component={Screens.VideoPlayerScreen} />
